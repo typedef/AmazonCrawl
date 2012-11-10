@@ -37,7 +37,7 @@ type ItemDetail struct {
 type AmazonCrawl struct {
 	
 	stop chan bool
-	popOdd chan string
+//	popOdd chan string
 	output chan string
 	outputstop chan bool
 	 f  *os.File
