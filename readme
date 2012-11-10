@@ -1,1 +1,4 @@
 根据sitemap提供的url遍历网站，获取物品名和销售的实际价格
+1、将url指定问sitemap文件下载并解析，应用go自带的pkg "encoding/xml" ，只需要指定struct结构体就就能自动解析完成，提取想要的字段
+2、在sitemap的xml文件中提取loc字段的url信息，并行的向这些url发送请求，抓取webpage。
+3、将抓取到webpage信息解析，提取物品名称和物品实际销售的价格。
