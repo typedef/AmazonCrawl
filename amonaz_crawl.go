@@ -43,10 +43,15 @@ type AmazonCrawl struct {
 	 f  *os.File
 }
 
+const (
+	outputBufferLen = 256
+	goroutineCnt	    = 8
+)
+
 
 func newAmazonCrawl(fileName string) *AmazonCrawl{
 	ret := new(AmazonCrawl)
-	ret.output = make(chan string, 256)
+	ret.output = make(chan string, outputBufferLen)
 	ret.outputstop = make(chan bool)
 	ret.f,_ = os.Create(fileName)
 	return ret
@@ -125,7 +130,7 @@ func (this *AmazonCrawl)ParseSiteMap(url string){
 	  
 	  fmt.Printf("XMLName: %#v\n", v.XMLName)
 	  visitePage := 0
-	  for _, node:= range v.ItemNode[1:1] {
+	  for _, node:= range v.ItemNode[1:] {
 		var res *http.Response 
 		var err error
 		if (strings.Index(node.Loc,"reviewdetail") == -1){
@@ -144,11 +149,10 @@ func (this *AmazonCrawl)ParseSiteMap(url string){
 	  	  	if err != nil {
 	  	    	   log.Fatal(err)
 			  }
-			   Len := len(v.UrlNodeList[0:24])
-			   MAX_STEP := 8
-			  for i:=1; i< MAX_STEP;i++{
-			   fmt.Println(Len*(i-1)/MAX_STEP, Len*i/MAX_STEP)
-			   go this.DoAction(v.UrlNodeList[ Len * (i-1) /MAX_STEP: Len * i /MAX_STEP])
+			   Len := len(v.UrlNodeList)
+			  for i:=1; i< goroutineCnt;i++{
+			   fmt.Println(Len*(i-1)/goroutineCnt, Len*i/goroutineCnt)
+			   go this.DoAction(v.UrlNodeList[ Len * (i-1) /goroutineCnt: Len * i /goroutineCnt])
 				 
 		   }	
 		}else{
